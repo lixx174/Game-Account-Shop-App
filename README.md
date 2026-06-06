@@ -29,11 +29,24 @@ pnpm dev
 # 构建生产环境
 pnpm build
 
+# 构建 GitHub Pages 部署版本
+pnpm build:github-pages
+
 # 预览生产构建
 pnpm preview
 ```
 
 开发服务器默认运行在 `http://localhost:3000`
+
+### 环境变量配置
+
+项目通过 `.env*` 文件控制不同部署场景的 `base` 路径：
+
+| 模式 | 读取文件 | `VITE_BASE` 值 | 用途 |
+|------|---------|---------------|------|
+| 开发（默认） | `.env` | `/` | 本地开发 |
+| 生产构建 | `.env.production` | `/` | 通用生产环境 |
+| GitHub Pages | `.env.github-pages` | `/Game-Account-Shop-App/` | GitHub Pages 子目录部署 |
 
 ## 项目目录结构
 
