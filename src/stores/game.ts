@@ -1,7 +1,8 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { getHotGames, getAllGames, searchGames } from '@/api/mock'
+import { getHotGames, getAllGames, searchGames } from '@/api/game'
 import type { GameItem } from '@/api/mockData'
+import { getFirstLetter } from '@/utils/pinyin'
 
 export const useGameStore = defineStore('game', () => {
   // State
@@ -28,11 +29,21 @@ export const useGameStore = defineStore('game', () => {
   })
 
   // Actions
+  /** 将服务端 GamePageDto 映射为前端 GameItem */
+  function mapGameDto(dto: { id: number; name: string; icon: string }): GameItem {
+    return {
+      id: String(dto.id),
+      name: dto.name,
+      icon: dto.icon,
+      letter: getFirstLetter(dto.name)
+    }
+  }
+
   async function fetchHotGames() {
     loading.value = true
     try {
       const res = await getHotGames()
-      hotGames.value = res.data || []
+      hotGames.value = (res.data?.records || []).map(mapGameDto)
     } finally {
       loading.value = false
     }
@@ -42,7 +53,7 @@ export const useGameStore = defineStore('game', () => {
     loading.value = true
     try {
       const res = await getAllGames()
-      allGames.value = res.data || []
+      allGames.value = (res.data?.records || []).map(mapGameDto)
     } finally {
       loading.value = false
     }
@@ -52,7 +63,7 @@ export const useGameStore = defineStore('game', () => {
     loading.value = true
     try {
       const res = await searchGames(keyword)
-      allGames.value = res.data || []
+      allGames.value = (res.data?.records || []).map(mapGameDto)
     } finally {
       loading.value = false
     }
