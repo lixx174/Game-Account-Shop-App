@@ -30,7 +30,7 @@ for (const group of data) {
         allGames.push({
             id: game.gameid.toString(),
             name: game.gamename,
-            icon: `/icons/${filename}`,
+            icon: `icons/${filename}`,
             letter: game.firstChar,
             iconUrl: url,
             filename: filename
