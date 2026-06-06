@@ -1,1 +1,6 @@
+# 依赖
 /node_modules
+
+# 环境变量
+.env.local
+.env.*.local
