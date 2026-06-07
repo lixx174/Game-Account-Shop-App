@@ -4,3 +4,5 @@
 # 环境变量
 .env.local
 .env.*.local
+/dist
+/app-web

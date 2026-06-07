@@ -8,7 +8,7 @@ export default {
       selectorBlackList: ['.ignore', '.app-container'], // 忽略转换的类名（app-container 的 max-width 需要固定 px）
       minPixelValue: 1,        // 最小转换值
       mediaQuery: false,       // 不转换媒体查询
-      exclude: [/node_modules/] // 排除 node_modules
+      exclude: [/node_modules/, /src\//] // 排除 node_modules 和项目源码
     }
   }
 }

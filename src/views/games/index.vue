@@ -139,6 +139,9 @@ function goBack() {
 }
 
 .nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -222,7 +225,7 @@ function goBack() {
 
 .letter-index {
   position: fixed;
-  right: 4px;
+  right: max(4px, calc(50% - 211px));
   top: 50%;
   transform: translateY(-50%);
   display: flex;
