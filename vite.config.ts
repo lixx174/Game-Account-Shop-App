@@ -18,18 +18,18 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       host: true,
-proxy: {
-  '/api': {
-    target: 'https://qinghaotech.com',
-    changeOrigin: true,
-    rewrite: (path) => path.replace(/^\/api/, '/api'),
-    configure: (proxy, options) => {
-      proxy.on('proxyReq', (proxyReq, req) => {
-        console.log('代理请求:', req.url, '→', proxyReq.path)
-      })
-    }
-  }
-}
+      proxy: {
+        "/api": {
+          target: "https://qinghaotech.com",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, "/api"),
+          configure: (proxy, options) => {
+            proxy.on("proxyReq", (proxyReq, req) => {
+              console.log("代理请求:", req.url, "→", proxyReq.path);
+            });
+          },
+        },
+      },
     },
   };
 });

@@ -127,7 +127,7 @@ function handleCopy(id: string) {
     <div class="bottom-bar">
       <div class="customer-service">
         <span class="cs-icon">淘</span>
-        <span class="cs-text">鑫轩游戏（请勿咨询他人以免被骗）</span>
+        <span class="cs-text">卿豪网络（请勿咨询他人以免被骗）</span>
       </div>
     </div>
 

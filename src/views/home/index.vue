@@ -26,7 +26,7 @@ function handleSearchClick() {
     <!-- 头部渐变区域 -->
     <div class="home-header">
       <div class="header-content">
-        <h1 class="header-title">鑫轩游戏,你想要的，这里都有</h1>
+        <h1 class="header-title">卿豪网络,你想要的，这里都有</h1>
         <p class="header-subtitle">担保交易·累计交易超过106592单</p>
 
         <!-- 搜索框 -->
@@ -37,10 +37,10 @@ function handleSearchClick() {
         </div>
 
         <!-- 热门搜索 -->
-        <div class="hot-tags">
+        <!-- <div class="hot-tags">
           <span class="hot-tag-icon">🔥</span>
           <span class="hot-tag-text">向僵尸开炮</span>
-        </div>
+        </div> -->
       </div>
     </div>
 
