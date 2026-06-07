@@ -24,6 +24,7 @@ export interface GoodsItem {
   level?: string
   updateTime: string
   wantCount: number
+  systemName: string
 }
 
 export interface GoodsDetail {

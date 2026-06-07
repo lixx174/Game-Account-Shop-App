@@ -1,43 +1,46 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useGoodsStore } from '@/stores/goods'
-import { useGameStore } from '@/stores/game'
+import { onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useGoodsStore } from "@/stores/goods";
+import { useGameStore } from "@/stores/game";
 
-const route = useRoute()
-const router = useRouter()
-const goodsStore = useGoodsStore()
-const gameStore = useGameStore()
+const route = useRoute();
+const router = useRouter();
+const goodsStore = useGoodsStore();
+const gameStore = useGameStore();
 
-const gameId = route.params.gameId as string
-const game = gameStore.hotGames.find((g) => g.id === gameId)
+const gameId = route.params.gameId as string;
+const game = gameStore.hotGames.find((g) => g.id === gameId);
 
 onMounted(() => {
-  goodsStore.fetchGoodsList(gameId)
-})
+  goodsStore.fetchGoodsList(gameId);
+});
 
 function goBack() {
-  router.back()
+  router.back();
 }
 
 function goDetail(goodsId: string) {
-  router.push(`/goods-detail/${goodsId}`)
+  router.push(`/goods-detail/${goodsId}`);
 }
 
 function handleCopy(title: string, id: string) {
-  const text = `${title} - 商品ID: ${id}`
-  navigator.clipboard.writeText(text).then(() => {
-    alert('复制成功')
-  }).catch(() => {
-    // 降级方案
-    const input = document.createElement('input')
-    input.value = text
-    document.body.appendChild(input)
-    input.select()
-    document.execCommand('copy')
-    document.body.removeChild(input)
-    alert('复制成功')
-  })
+  const text = `${title} - 商品ID: ${id}`;
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      alert("复制成功");
+    })
+    .catch(() => {
+      // 降级方案
+      const input = document.createElement("input");
+      input.value = text;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      document.body.removeChild(input);
+      alert("复制成功");
+    });
 }
 </script>
 
@@ -47,8 +50,13 @@ function handleCopy(title: string, id: string) {
     <div class="nav-bar">
       <span class="nav-back" @click="goBack">&lt;</span>
       <div class="nav-game">
-        <img v-if="game" class="nav-game-icon" :src="game.icon" :alt="game.name" />
-        <span class="nav-game-name">{{ game?.name || '商品列表' }}</span>
+        <img
+          v-if="game"
+          class="nav-game-icon"
+          :src="game.icon"
+          :alt="game.name"
+        />
+        <span class="nav-game-name">{{ game?.name || "商品列表" }}</span>
       </div>
       <span class="nav-share">↗</span>
     </div>
@@ -57,7 +65,11 @@ function handleCopy(title: string, id: string) {
     <div class="search-section">
       <div class="search-input-box">
         <span class="search-icon">🔍</span>
-        <input class="search-input" type="text" placeholder="请输入关键词查找" />
+        <input
+          class="search-input"
+          type="text"
+          placeholder="请输入关键词查找"
+        />
         <button class="search-btn">搜索</button>
       </div>
     </div>
@@ -86,8 +98,14 @@ function handleCopy(title: string, id: string) {
           <div class="goods-body">
             <!-- 左侧图片 -->
             <div class="goods-image-wrap">
-              <img class="goods-image" :src="item.images[0]" :alt="item.title" />
-              <span v-if="item.images.length > 1" class="image-count">{{ item.images.length }}图</span>
+              <img
+                class="goods-image"
+                :src="item.images[0]"
+                :alt="item.title"
+              />
+              <span v-if="item.images.length > 1" class="image-count"
+                >{{ item.images.length }}图</span
+              >
             </div>
 
             <!-- 右侧信息 -->
@@ -96,16 +114,23 @@ function handleCopy(title: string, id: string) {
                 <span class="info-item">{{ item.platform }}</span>
                 <span class="info-sep">|</span>
                 <span class="info-item">{{ item.server }}</span>
+                <span class="info-sep">|</span>
+                <span class="info-item">{{ item.systemName }}</span>
               </div>
 
               <div class="goods-tags">
-                <span v-for="tag in item.tags" :key="tag" class="goods-tag">{{ tag }}</span>
+                <span v-for="tag in item.tags" :key="tag" class="goods-tag">{{
+                  tag
+                }}</span>
               </div>
 
               <div class="goods-price">¥{{ item.price.toFixed(2) }}</div>
 
               <div class="goods-actions">
-                <button class="action-btn copy-btn" @click.stop="handleCopy(item.title, item.id)">
+                <button
+                  class="action-btn copy-btn"
+                  @click.stop="handleCopy(item.title, item.id)"
+                >
                   一键复制
                 </button>
                 <button class="action-btn contact-btn" @click.stop>

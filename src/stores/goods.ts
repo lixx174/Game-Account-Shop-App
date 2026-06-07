@@ -27,7 +27,8 @@ export const useGoodsStore = defineStore('goods', () => {
       server: dto.serverName || '',
       level: '', // 服务端暂无该字段
       updateTime: '-', // 服务端暂无该字段
-      wantCount: 0 // 服务端暂无该字段
+      wantCount: 0, // 服务端暂无该字段
+      systemName: dto.systemName || ''
     }
   }
 
