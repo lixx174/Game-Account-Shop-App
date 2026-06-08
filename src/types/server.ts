@@ -39,6 +39,7 @@ export interface ServerGamePageQuery {
 /** 服务端：账号分页DTO */
 export interface ServerGameAccountPageDto {
   id: number
+  accountNo: string
   title: string
   originName: string
   serverName: string
@@ -46,6 +47,7 @@ export interface ServerGameAccountPageDto {
   tags: string[]
   price: number
   img: string
+  customerEndpoint: string
 }
 
 /** 服务端：账号分页查询 */
@@ -56,11 +58,20 @@ export interface ServerGameAccountPageQuery {
   originId?: number
   systemId?: number
   title?: string
+  /** 排序字段：PRICE(价格) / PUBLISH_TIME(发布时间) */
+  sortColumn?: 'PRICE' | 'PUBLISH_TIME'
+  /** 排序方式：ASC(升序) / DESC(降序) */
+  sortType?: 'ASC' | 'DESC'
+  /** 最低价 */
+  minPrice?: number
+  /** 最高价 */
+  maxPrice?: number
 }
 
 /** 服务端：账号详情DTO */
 export interface ServerGameAccountDetailDto {
   id: number
+  accountNo: string
   title: string
   originName: string
   serverName: string

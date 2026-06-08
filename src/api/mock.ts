@@ -49,12 +49,42 @@ export async function searchGames(keyword: string) {
 // ========== 商品相关接口 ==========
 
 /** 获取某游戏下的商品列表 */
-export async function getGoodsList(gameId: string, _params?: Record<string, any>) {
+export async function getGoodsList(gameId: string, params?: Record<string, any>) {
   await delay(400)
-  const list = mockGoodsList[gameId] || []
+  let list = [...(mockGoodsList[gameId] || [])]
+
+  // Mock 环境：本地模拟排序和筛选
+  if (params) {
+    // 价格区间筛选
+    const minPrice = 'minPrice' in params ? Number(params.minPrice) : undefined
+    const maxPrice = 'maxPrice' in params ? Number(params.maxPrice) : undefined
+    if (minPrice || maxPrice) {
+      list = list.filter((item) => {
+        const aboveMin = !minPrice || item.price >= minPrice
+        const belowMax = !maxPrice || item.price <= maxPrice
+        return aboveMin && belowMax
+      })
+    }
+
+    // 排序（本地模拟）
+    const sortColumn = params.sortColumn
+    const sortType = params.sortType
+    if (sortColumn === 'PRICE') {
+      list.sort((a, b) => {
+        return sortType === 'DESC' ? b.price - a.price : a.price - b.price
+      })
+    }
+  }
+
+  // 包装为分页格式，兼容真实接口
   return {
     code: 200,
-    data: list,
+    data: {
+      current: params?.current || 1,
+      size: params?.size || 20,
+      pages: 1,
+      records: list
+    },
     message: 'success'
   }
 }

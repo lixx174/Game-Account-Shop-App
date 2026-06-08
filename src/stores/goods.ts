@@ -11,6 +11,8 @@ export const useGoodsStore = defineStore('goods', () => {
   const loading = ref(false)
   /** 当前浏览的商品所属游戏ID（详情页需要） */
   const currentGameId = ref('')
+  /** 当前浏览商品的客服跳转链接（列表带入详情页） */
+  const currentCustomerEndpoint = ref('')
 
   // Actions
 
@@ -18,6 +20,7 @@ export const useGoodsStore = defineStore('goods', () => {
   function mapGoodsItem(dto: ServerGameAccountPageDto, gameId: string): GoodsItem {
     return {
       id: String(dto.id),
+      accountNo: dto.accountNo || String(dto.id),
       gameId,
       title: dto.title,
       price: dto.price,
@@ -28,7 +31,8 @@ export const useGoodsStore = defineStore('goods', () => {
       level: '', // 服务端暂无该字段
       updateTime: '-', // 服务端暂无该字段
       wantCount: 0, // 服务端暂无该字段
-      systemName: dto.systemName || ''
+      systemName: dto.systemName || '',
+      customerEndpoint: dto.customerEndpoint || ''
     }
   }
 
@@ -46,6 +50,7 @@ export const useGoodsStore = defineStore('goods', () => {
 
     return {
       id: String(dto.id),
+      accountNo: dto.accountNo || String(dto.id),
       gameId,
       gameName: '', // 由调用方从 gameStore 补充
       title: dto.title,
@@ -79,6 +84,9 @@ export const useGoodsStore = defineStore('goods', () => {
         return
       }
       goodsDetail.value = mapGoodsDetail(dto, currentGameId.value)
+      // 尝试从列表缓存中获取客服链接
+      const cached = goodsList.value.find((g) => g.id === String(goodsId))
+      currentCustomerEndpoint.value = cached?.customerEndpoint || ''
     } finally {
       loading.value = false
     }
@@ -89,6 +97,7 @@ export const useGoodsStore = defineStore('goods', () => {
     goodsDetail,
     loading,
     currentGameId,
+    currentCustomerEndpoint,
     fetchGoodsList,
     fetchGoodsDetail
   }
