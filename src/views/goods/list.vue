@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { showImagePreview } from 'vant'
 import { useGoodsStore } from '@/stores/goods'
 import { useGameStore } from '@/stores/game'
 
@@ -111,14 +112,13 @@ function goDetail(goodsId: string) {
 
 function handleImagePreview(itemImages: string[]) {
   if (itemImages.length === 0) return
-  globalThis.dispatchEvent(
-    new CustomEvent('image-preview', {
-      detail: {
-        images: itemImages,
-        startIndex: 0
-      }
-    })
-  )
+  showImagePreview({
+    images: itemImages,
+    startPosition: 0,
+    showIndex: true,
+    closeable: true,
+    closeIconPosition: 'top-right'
+  })
 }
 
 function handleCopy(title: string, accountNo: string) {

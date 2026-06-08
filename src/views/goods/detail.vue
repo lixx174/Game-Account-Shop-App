@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { showImagePreview } from 'vant'
 import { useGoodsStore } from '@/stores/goods'
 import { useGameStore } from '@/stores/game'
 
@@ -43,16 +44,14 @@ function handleContact() {
 }
 
 function handleImagePreview(startIdx: number) {
-  if (!goodsStore.goodsDetail) return
-  // 触发自定义事件，由图片预览组件监听
-  globalThis.dispatchEvent(
-    new CustomEvent('image-preview', {
-      detail: {
-        images: goodsStore.goodsDetail.images,
-        startIndex: startIdx
-      }
-    })
-  )
+  if (!goodsStore.goodsDetail || goodsStore.goodsDetail.images.length === 0) return
+  showImagePreview({
+    images: goodsStore.goodsDetail.images,
+    startPosition: startIdx,
+    showIndex: true,
+    closeable: true,
+    closeIconPosition: 'top-right'
+  })
 }
 </script>
 
