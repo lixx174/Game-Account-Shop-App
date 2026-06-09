@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { showImagePreview } from 'vant'
 import { useGoodsStore } from '@/stores/goods'
 import { useGameStore } from '@/stores/game'
+import { getDictionaryPicker } from '@/api/dictionary'
 
 const route = useRoute()
 const router = useRouter()
@@ -12,6 +13,17 @@ const gameStore = useGameStore()
 
 const gameId = route.params.gameId as string
 const game = gameStore.hotGames.find((g) => g.id === gameId)
+
+// ===== 搜索关键词 =====
+const searchKeyword = ref('')
+
+// ===== 客户端/系统筛选相关 =====
+const showOriginPanel = ref(false)
+const showSystemPanel = ref(false)
+const originId = ref<number | null>(null)
+const systemId = ref<number | null>(null)
+const originOptions = ref<{ id: number; name: string }[]>([])
+const systemOptions = ref<{ id: number; name: string }[]>([])
 
 // ===== 排序相关 =====
 const showSortPanel = ref(false)
@@ -95,10 +107,64 @@ function loadGoodsList() {
     params.maxPrice = max
   }
 
+  // 关键词搜索
+  if (searchKeyword.value.trim()) {
+    params.title = searchKeyword.value.trim()
+  }
+
+  // 客户端/系统筛选
+  if (originId.value != null) {
+    params.originId = originId.value
+  }
+  if (systemId.value != null) {
+    params.systemId = systemId.value
+  }
+
   goodsStore.fetchGoodsList(gameId, Object.keys(params).length > 0 ? params : undefined)
 }
 
+async function loadDictionaries() {
+  const [originRes, systemRes] = await Promise.all([
+    getDictionaryPicker(gameId, 'ORIGIN'),
+    getDictionaryPicker(gameId, 'SYSTEM')
+  ])
+  originOptions.value = (originRes.data?.records || []).map((item: { id: number; name: string }) => ({
+    id: item.id,
+    name: item.name
+  }))
+  systemOptions.value = (systemRes.data?.records || []).map((item: { id: number; name: string }) => ({
+    id: item.id,
+    name: item.name
+  }))
+}
+
+function closeAllPanels() {
+  showSortPanel.value = false
+  showFilterPanel.value = false
+  showOriginPanel.value = false
+  showSystemPanel.value = false
+}
+
+function togglePanel(panel: 'sort' | 'filter' | 'origin' | 'system') {
+  const wasOpen =
+    panel === 'sort'
+      ? showSortPanel.value
+      : panel === 'filter'
+        ? showFilterPanel.value
+        : panel === 'origin'
+          ? showOriginPanel.value
+          : showSystemPanel.value
+  closeAllPanels()
+  if (!wasOpen) {
+    if (panel === 'sort') showSortPanel.value = true
+    else if (panel === 'filter') showFilterPanel.value = true
+    else if (panel === 'origin') showOriginPanel.value = true
+    else if (panel === 'system') showSystemPanel.value = true
+  }
+}
+
 onMounted(() => {
+  loadDictionaries()
   loadGoodsList()
 })
 
@@ -163,28 +229,74 @@ function handleContact(endpoint: string) {
     <div class="search-section">
       <div class="search-input-box">
         <span class="search-icon">🔍</span>
-        <input class="search-input" type="text" placeholder="请输入关键词查找" />
-        <button class="search-btn">搜索</button>
+        <input
+          v-model="searchKeyword"
+          class="search-input"
+          type="text"
+          placeholder="请输入关键词查找"
+          @keyup.enter="loadGoodsList"
+        />
+        <button class="search-btn" @click="loadGoodsList">搜索</button>
       </div>
     </div>
 
     <!-- 筛选栏 -->
     <div class="filter-bar">
-      <div class="filter-item">客户端 ▼</div>
-      <div class="filter-item">安卓 ▼</div>
+      <div
+        class="filter-item"
+        :class="{ active: originId != null }"
+        @click="togglePanel('origin')"
+      >
+        {{ originId != null ? originOptions.find((o) => o.id === originId)?.name : '客户端' }} ▼
+      </div>
+      <div
+        class="filter-item"
+        :class="{ active: systemId != null }"
+        @click="togglePanel('system')"
+      >
+        {{ systemId != null ? systemOptions.find((s) => s.id === systemId)?.name : '系统' }} ▼
+      </div>
       <div
         class="filter-item"
         :class="{ active: currentSort !== 'default' }"
-        @click="showSortPanel = !showSortPanel; showFilterPanel = false"
+        @click="togglePanel('sort')"
       >
         {{ getSortLabel() }} ▼
       </div>
       <div
         class="filter-item"
         :class="{ active: minPriceInput || maxPriceInput }"
-        @click="showFilterPanel = !showFilterPanel; showSortPanel = false"
+        @click="togglePanel('filter')"
       >
         筛选 ▼
+      </div>
+    </div>
+
+    <!-- 客户端下拉面板 -->
+    <div v-if="showOriginPanel" class="sort-panel">
+      <div
+        v-for="opt in originOptions"
+        :key="opt.id"
+        class="sort-option"
+        :class="{ active: originId === opt.id }"
+        @click="originId = originId === opt.id ? null : opt.id; closeAllPanels(); loadGoodsList()"
+      >
+        {{ opt.name }}
+        <span v-if="originId === opt.id" class="sort-check">✓</span>
+      </div>
+    </div>
+
+    <!-- 系统下拉面板 -->
+    <div v-if="showSystemPanel" class="sort-panel">
+      <div
+        v-for="opt in systemOptions"
+        :key="opt.id"
+        class="sort-option"
+        :class="{ active: systemId === opt.id }"
+        @click="systemId = systemId === opt.id ? null : opt.id; closeAllPanels(); loadGoodsList()"
+      >
+        {{ opt.name }}
+        <span v-if="systemId === opt.id" class="sort-check">✓</span>
       </div>
     </div>
 
@@ -243,9 +355,9 @@ function handleContact(endpoint: string) {
 
     <!-- 遮罩层（点击关闭面板） -->
     <div
-      v-if="showSortPanel || showFilterPanel"
+      v-if="showSortPanel || showFilterPanel || showOriginPanel || showSystemPanel"
       class="overlay"
-      @click="showSortPanel = false; showFilterPanel = false"
+      @click="closeAllPanels()"
     ></div>
 
     <!-- 商品列表 -->
@@ -299,19 +411,18 @@ function handleContact(endpoint: string) {
                 <button class="action-btn copy-btn" @click.stop="handleCopy(item.title, item.accountNo)">
                   一键复制
                 </button>
-                <button
-                  class="action-btn contact-btn"
-                  :class="{ disabled: !item.customerEndpoint }"
-                  @click.stop="handleContact(item.customerEndpoint)"
-                >
+                <!-- 客服按钮（暂不开放） -->
+                <!-- <button class="action-btn contact-btn" @click.stop>
                   💬 网站唯一咨询客服
-                </button>
+                </button> -->
               </div>
             </div>
           </div>
         </div>
 
-        <div v-if="goodsStore.goodsList.length === 0" class="empty-text">暂无商品</div>
+        <div v-if="goodsStore.goodsList.length === 0" class="empty-text">
+          暂无商品
+        </div>
       </template>
     </div>
   </div>
@@ -319,14 +430,16 @@ function handleContact(endpoint: string) {
 
 <style scoped>
 .goods-list-page {
-  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
   background-color: #f5f5f5;
 }
 
 .nav-bar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -368,6 +481,7 @@ function handleContact(endpoint: string) {
 }
 
 .search-section {
+  flex-shrink: 0;
   padding: 10px 16px;
   background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
 }
@@ -410,6 +524,7 @@ function handleContact(endpoint: string) {
 }
 
 .filter-bar {
+  flex-shrink: 0;
   position: relative;
   z-index: 12;
   display: flex;
@@ -567,6 +682,8 @@ function handleContact(endpoint: string) {
 }
 
 .goods-list {
+  flex: 1;
+  overflow-y: auto;
   position: relative;
   z-index: 1;
   padding: 10px 12px;
@@ -583,31 +700,10 @@ function handleContact(endpoint: string) {
   font-size: 15px;
   font-weight: 500;
   color: #333;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.goods-account-no {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.account-label {
-  font-size: 11px;
-  color: #999;
-  background-color: #f5f5f5;
-  padding: 1px 6px;
-  border-radius: 3px;
-}
-
-.account-value {
-  font-size: 12px;
-  color: #666;
-  font-family: monospace;
 }
 
 .goods-body {
@@ -697,16 +793,12 @@ function handleContact(endpoint: string) {
   color: #fff;
 }
 
+/* 客服按钮样式（暂不开放）
 .contact-btn {
   background-color: #e6f7ff;
   color: #0083b0;
 }
-
-.contact-btn.disabled {
-  background-color: #f5f5f5;
-  color: #bbb;
-  cursor: not-allowed;
-}
+*/
 
 .loading-text,
 .empty-text {
