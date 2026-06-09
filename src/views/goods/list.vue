@@ -133,9 +133,10 @@ function handleCopy(title: string, id: string) {
                 >
                   一键复制
                 </button>
-                <button class="action-btn contact-btn" @click.stop>
+                <!-- 客服按钮（暂不开放） -->
+                <!-- <button class="action-btn contact-btn" @click.stop>
                   💬 网站唯一咨询客服
-                </button>
+                </button> -->
               </div>
             </div>
           </div>
@@ -364,10 +365,12 @@ function handleCopy(title: string, id: string) {
   color: #fff;
 }
 
+/* 客服按钮样式（暂不开放）
 .contact-btn {
   background-color: #e6f7ff;
   color: #0083b0;
 }
+*/
 
 .loading-text,
 .empty-text {

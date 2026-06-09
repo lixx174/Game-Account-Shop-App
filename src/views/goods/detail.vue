@@ -85,7 +85,7 @@ function handleCopy(id: string) {
           一键复制
         </button>
       </div>
-      <p class="id-tip">点击复制，粘贴发送给最下方客服</p>
+      <!-- <p class="id-tip">点击复制，粘贴发送给最下方客服</p> -->
     </div>
 
     <!-- 商品参数 -->
@@ -123,13 +123,13 @@ function handleCopy(id: string) {
       />
     </div>
 
-    <!-- 底部客服栏 -->
-    <div class="bottom-bar">
+    <!-- 底部客服栏（暂不开放） -->
+    <!-- <div class="bottom-bar">
       <div class="customer-service">
         <span class="cs-icon">淘</span>
         <span class="cs-text">卿豪网络（请勿咨询他人以免被骗）</span>
       </div>
-    </div>
+    </div> -->
 
     <!-- 加载中 -->
     <div v-if="goodsStore.loading" class="loading-wrap">
@@ -142,7 +142,8 @@ function handleCopy(id: string) {
 .goods-detail-page {
   min-height: 100vh;
   background-color: #f5f5f5;
-  padding-bottom: 60px;
+  /* 客服栏关闭后无需底部留白 */
+  /* padding-bottom: 60px; */
 }
 
 .nav-bar {
@@ -352,6 +353,7 @@ function handleCopy(id: string) {
   display: block;
 }
 
+/* 客服栏样式（暂不开放）
 .bottom-bar {
   position: fixed;
   bottom: 0;
@@ -388,6 +390,7 @@ function handleCopy(id: string) {
   font-size: 13px;
   color: #666;
 }
+*/
 
 .loading-wrap {
   position: fixed;
