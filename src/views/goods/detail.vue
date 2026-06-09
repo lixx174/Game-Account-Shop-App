@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { showImagePreview } from 'vant'
 import { useGoodsStore } from '@/stores/goods'
 import { useGameStore } from '@/stores/game'
 
@@ -10,7 +11,6 @@ const goodsStore = useGoodsStore()
 const gameStore = useGameStore()
 
 const goodsId = route.params.goodsId as string
-const showAllParams = ref(false)
 
 onMounted(() => {
   goodsStore.fetchGoodsDetail(goodsId)
@@ -22,17 +22,35 @@ function goBack() {
   router.back()
 }
 
-function handleCopy(id: string) {
-  navigator.clipboard.writeText(id).then(() => {
-    alert('商品ID复制成功')
+function handleCopy(accountNo: string) {
+  navigator.clipboard.writeText(accountNo).then(() => {
+    alert('编号复制成功')
   }).catch(() => {
     const input = document.createElement('input')
-    input.value = id
+    input.value = accountNo
     document.body.appendChild(input)
     input.select()
     document.execCommand('copy')
-    document.body.removeChild(input)
-    alert('商品ID复制成功')
+    input.remove()
+    alert('编号复制成功')
+  })
+}
+
+function handleContact() {
+  const endpoint = goodsStore.currentCustomerEndpoint
+  if (endpoint) {
+    window.open(endpoint, '_blank')
+  }
+}
+
+function handleImagePreview(startIdx: number) {
+  if (!goodsStore.goodsDetail || goodsStore.goodsDetail.images.length === 0) return
+  showImagePreview({
+    images: goodsStore.goodsDetail.images,
+    startPosition: startIdx,
+    showIndex: true,
+    closeable: true,
+    closeIconPosition: 'top-right'
   })
 }
 </script>
@@ -49,7 +67,7 @@ function handleCopy(id: string) {
       <span class="nav-share">↗</span>
     </div>
 
-    <!-- 截图轮播 -->
+    <!-- 截图轮播（填满） -->
     <div v-if="goodsStore.goodsDetail" class="screenshot-section">
       <div class="screenshot-scroll">
         <img
@@ -58,6 +76,7 @@ function handleCopy(id: string) {
           class="screenshot-img"
           :src="img"
           alt="游戏截图"
+          @click="handleImagePreview(idx)"
         />
       </div>
     </div>
@@ -76,25 +95,23 @@ function handleCopy(id: string) {
       </div>
     </div>
 
-    <!-- 商品ID -->
+    <!-- 商品编号 -->
     <div v-if="goodsStore.goodsDetail" class="id-section">
       <div class="id-row">
-        <span class="id-label">商品ID</span>
-        <span class="id-value">{{ goodsStore.goodsDetail.id }}</span>
-        <button class="id-copy-btn" @click="handleCopy(goodsStore.goodsDetail.id)">
+        <span class="id-label">商品编号</span>
+        <span class="id-value">{{ goodsStore.goodsDetail.accountNo }}</span>
+        <button class="id-copy-btn" @click="handleCopy(goodsStore.goodsDetail.accountNo)">
           一键复制
         </button>
       </div>
       <!-- <p class="id-tip">点击复制，粘贴发送给最下方客服</p> -->
     </div>
 
-    <!-- 商品参数 -->
+    <!-- 商品参数（全部展示，取消折叠） -->
     <div v-if="goodsStore.goodsDetail" class="params-section">
       <div class="params-grid">
         <div
-          v-for="(param, idx) in showAllParams
-            ? goodsStore.goodsDetail.params
-            : goodsStore.goodsDetail.params.slice(0, 6)"
+          v-for="(param, idx) in goodsStore.goodsDetail.params"
           :key="idx"
           class="param-item"
         >
@@ -102,17 +119,9 @@ function handleCopy(id: string) {
           <span class="param-value">{{ param.value }}</span>
         </div>
       </div>
-      <div
-        v-if="goodsStore.goodsDetail.params.length > 6"
-        class="params-toggle"
-        @click="showAllParams = !showAllParams"
-      >
-        {{ showAllParams ? '收起参数' : '全部参数' }}
-        <span class="toggle-arrow">{{ showAllParams ? '▲' : '▼' }}</span>
-      </div>
     </div>
 
-    <!-- 截图详情 -->
+    <!-- 截图详情（可点击放大） -->
     <div v-if="goodsStore.goodsDetail" class="detail-images">
       <img
         v-for="(img, idx) in goodsStore.goodsDetail.images"
@@ -120,12 +129,17 @@ function handleCopy(id: string) {
         class="detail-img"
         :src="img"
         alt="游戏截图"
+        @click="handleImagePreview(idx)"
       />
     </div>
 
     <!-- 底部客服栏（暂不开放） -->
     <!-- <div class="bottom-bar">
-      <div class="customer-service">
+      <div
+        class="customer-service"
+        :class="{ disabled: !goodsStore.currentCustomerEndpoint }"
+        @click="handleContact"
+      >
         <span class="cs-icon">淘</span>
         <span class="cs-text">卿豪网络（请勿咨询他人以免被骗）</span>
       </div>
@@ -192,23 +206,22 @@ function handleCopy(id: string) {
 
 .screenshot-section {
   background-color: #fff;
-  padding: 12px 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 .screenshot-scroll {
   display: flex;
-  gap: 8px;
-  padding: 0 12px;
+  gap: 0;
 }
 
 .screenshot-img {
-  width: 280px;
-  height: 160px;
-  border-radius: 8px;
+  width: 100vw;
+  max-width: 430px;
+  height: 220px;
   object-fit: cover;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
 .price-section {
@@ -323,23 +336,6 @@ function handleCopy(id: string) {
   color: #333;
 }
 
-.params-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
-  font-size: 13px;
-  color: #666;
-  cursor: pointer;
-}
-
-.toggle-arrow {
-  font-size: 10px;
-}
-
 .detail-images {
   margin-top: 10px;
   padding: 12px;
@@ -351,6 +347,7 @@ function handleCopy(id: string) {
   border-radius: 8px;
   margin-bottom: 10px;
   display: block;
+  cursor: pointer;
 }
 
 /* 客服栏样式（暂不开放）
@@ -371,6 +368,11 @@ function handleCopy(id: string) {
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+}
+
+.customer-service.disabled {
+  cursor: not-allowed;
 }
 
 .cs-icon {

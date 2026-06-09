@@ -14,6 +14,7 @@ export interface GameItem {
 
 export interface GoodsItem {
   id: string
+  accountNo: string
   gameId: string
   title: string
   price: number
@@ -25,10 +26,12 @@ export interface GoodsItem {
   updateTime: string
   wantCount: number
   systemName: string
+  customerEndpoint: string
 }
 
 export interface GoodsDetail {
   id: string
+  accountNo: string
   gameId: string
   gameName: string
   title: string
@@ -456,6 +459,7 @@ export const mockGoodsList: Record<string, GoodsItem[]> = {
   '1002859': [
     {
       id: 'g001',
+      accountNo: 'A1008601',
       gameId: '1002859',
       title: '准毕业6by有终身三星闪迪卡',
       price: 1595,
@@ -465,10 +469,13 @@ export const mockGoodsList: Record<string, GoodsItem[]> = {
       server: '2210服',
       level: '234',
       updateTime: '4小时前',
-      wantCount: 99
+      wantCount: 99,
+      systemName: '安卓',
+      customerEndpoint: 'https://www.taobao.com'
     },
     {
       id: 'g002',
+      accountNo: 'A1008602',
       gameId: '1002859',
       title: '自己看吧。',
       price: 2140,
@@ -478,7 +485,9 @@ export const mockGoodsList: Record<string, GoodsItem[]> = {
       server: '1327服',
       level: '188',
       updateTime: '6小时前',
-      wantCount: 45
+      wantCount: 45,
+      systemName: '安卓',
+      customerEndpoint: 'https://www.taobao.com'
     }
   ]
 }
@@ -487,6 +496,7 @@ export const mockGoodsList: Record<string, GoodsItem[]> = {
 export const mockGoodsDetail: Record<string, GoodsDetail> = {
   'g001': {
     id: 'g001',
+    accountNo: 'A1008601',
     gameId: '1002859',
     gameName: '奥特曼系列OL',
     title: '准毕业6by有终身三星闪迪卡',
