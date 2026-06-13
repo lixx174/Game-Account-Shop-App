@@ -73,6 +73,7 @@ export interface ServerGameAccountDetailDto {
   id: number
   accountNo: string
   title: string
+  gameName:string
   originName: string
   serverName: string
   systemName: string

@@ -39,7 +39,7 @@ export const useGoodsStore = defineStore('goods', () => {
   /** 将服务端账号详情DTO映射为前端 GoodsDetail */
   function mapGoodsDetail(dto: ServerGameAccountDetailDto, gameId: string): GoodsDetail {
     const params = [
-      { label: '游戏名称', value: dto.title },
+      { label: '游戏名称', value: dto.gameName },
       { label: '客户端', value: dto.originName || '' },
       { label: '系统', value: dto.systemName || '' },
       { label: '服务器', value: dto.serverName || '' },
